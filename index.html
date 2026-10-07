@@ -136,7 +136,7 @@ function ordenaTemporal(gs) {
   const chave = g => {
     const [d, m] = g.data.split("/").map(Number);
     const h = g.hora.match(/(\d+)h(\d+)/);
-    return m * 100000 + d * 10000 + (h ? (+h[1]) * 100 + (+h[2]) : 0);
+    return m * 1000000 + d * 10000 + (h ? (+h[1]) * 100 + (+h[2]) : 0);
   };
   return [...gs].sort((a, b) => chave(a) - chave(b));
 }
