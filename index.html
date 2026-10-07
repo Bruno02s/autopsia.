@@ -35,6 +35,7 @@
   .card.active { border-color: var(--destaque); background: #16202e; }
   .card.tocando { border-color: #5cc96e; background: #14231a; box-shadow: 0 0 0 1px #5cc96e inset; }
   .card.tocando::before { content: "▶ "; color: #5cc96e; }
+  .card.envolvida { border-color: #e8c34a; }
   #player { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--borda); padding: 8px 16px; display: none; align-items: center; gap: 12px; }
   #player.on { display: flex; }
   #player audio { flex: 1; height: 36px; }
@@ -172,7 +173,7 @@ function gramposFiltrados() {
 
 function cardHTML(g) {
   const pessoas = g.participantes.map(p => `<span class="legenda" style="background:${CAT_CORES[p.categoria]}"></span>${p.nome}${p.papel ? ` <em>(${p.papel})</em>` : ""}`).join("; ");
-  return `<div class="card${g.id === tocandoId ? " tocando" : ""}" data-id="${g.id}">
+  return `<div class="card${g.id === tocandoId ? " tocando" : ""}${pessoaMarcada && g.participantes.some(p => p.nome === pessoaMarcada) ? " envolvida" : ""}" data-id="${g.id}">
     <div class="titulo">${g.data}, ${g.hora}${g.duracao ? " · " + g.duracao : ""}</div>
     <div class="detalhe">${pessoas}</div>
     ${(g.assuntos && g.assuntos.length) ? `<div class="detalhe" style="margin-top:4px">🏷 ${g.assuntos.join(" · ")}</div>` : ""}
@@ -214,10 +215,10 @@ function render() {
       interaction: { hover: true, tooltipDelay: 100 } });
 
   rede.on("click", p => {
-    if (p.edges.length) tocar(p.edges[0].split("|")[0]);
-    else if (p.nodes.length) mostrarConversas(p.nodes[0]);
+    if (p.nodes.length) marcarConversasDe(p.nodes[0]);
+    else if (p.edges.length) tocar(p.edges[0].split("|")[0]);
   });
-  rede.on("doubleClick", p => { if (p.nodes.length) tocarDePessoa(p.nodes[0]); });
+  rede.on("doubleClick", p => { if (p.nodes.length) marcarConversasDe(p.nodes[0]); });
 
   painelTitulo.textContent = `Conversas filtradas (${gs.length})`;
   lista.innerHTML = ordenaTemporal(gs).map(cardHTML).join("");
@@ -225,10 +226,31 @@ function render() {
 }
 
 const listaDe = gs => gs.map(g => g.id);
+let pessoaMarcada = null;
+function marcarConversasDe(nome) {
+  pessoaMarcada = nome;
+  // destaca no mapa as arestas das conversas dessa pessoa
+  const ids = new Set(grampos.filter(g => g.participantes.some(p => p.nome === nome)).map(g => g.id));
+  const gsEdges = rede.body.data.edges.getIds();
+  const upd = [];
+  gsEdges.forEach(eid => {
+    const [, a, b] = eid.split("|");
+    if (ids.has(eid.split("|")[0])) upd.push({ id: eid, color: { color: "#e8c34a", highlight: "#e8c34a" }, width: 3 });
+    else upd.push({ id: eid, color: { color: "#3a4453", highlight: "#4ea1ff" }, width: 1.4 });
+  });
+  rede.body.data.edges.update(upd);
+  // marca os cards no painel
+  document.querySelectorAll(".card").forEach(c =>
+    c.classList.toggle("envolvida", ids.has(c.dataset.id)));
+  mostrarConversas(nome);
+}
 function mostrarConversas(nome) {
   painelTitulo.textContent = `Conversas de ${nome}`;
-  const gs = grampos.filter(g => g.participantes.some(p => p.nome === nome));
-  lista.innerHTML = ordenaTemporal(gs).map(cardHTML).join("");
+  const gs = ordenaTemporal(grampos.filter(g => g.participantes.some(p => p.nome === nome)));
+  lista.innerHTML = gs.map(cardHTML).join("");
+  const ids = new Set(gs.map(g => g.id));
+  document.querySelectorAll(".card").forEach(c =>
+    c.classList.toggle("envolvida", ids.has(c.dataset.id)));
   bindCards();
 }
 function tocar(id) { tocarLista(id, grampos.filter(g => g.id === id)); }
