@@ -450,11 +450,6 @@
   "duracao": "",
   "participantes": [
    {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
-   {
     "nome": "Marisa",
     "papel": "mulher de Lula",
     "categoria": "Família de Lula"
@@ -463,6 +458,11 @@
     "nome": "Fábio Luís",
     "papel": "filho de Lula",
     "categoria": "Família de Lula"
+   },
+   {
+    "nome": "Lula",
+    "papel": "ex-presidente",
+    "categoria": "Governo/Partidos"
    }
   ],
   "assuntos": [],
@@ -511,11 +511,6 @@
   "video_id": "4893240",
   "duracao": "",
   "participantes": [
-   {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
    {
     "nome": "Fábio Silva",
     "papel": "filho de Lula",
@@ -568,11 +563,6 @@
   "video_id": "4893210",
   "duracao": "",
   "participantes": [
-   {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
    {
     "nome": "Fábio Silva",
     "papel": "filho de Lula",
@@ -639,11 +629,6 @@
   "video_id": "4893153",
   "duracao": "",
   "participantes": [
-   {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
    {
     "nome": "Fábio Silva",
     "papel": "filho de Lula",
@@ -810,11 +795,6 @@
   "duracao": "",
   "participantes": [
    {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
-   {
     "nome": "Fábio Silva",
     "papel": "filho de Lula",
     "categoria": "Família de Lula"
@@ -840,11 +820,6 @@
   "video_id": "4893096",
   "duracao": "",
   "participantes": [
-   {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
    {
     "nome": "Fábio Silva",
     "papel": "filho de Lula",
@@ -909,11 +884,6 @@
   "video_id": "4893065",
   "duracao": "",
   "participantes": [
-   {
-    "nome": "Lula",
-    "papel": "ex-presidente",
-    "categoria": "Outros contatos"
-   },
    {
     "nome": "Renata",
     "papel": "nora de Lula",
