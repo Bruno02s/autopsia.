@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autopsia — Mapa das Conversas da Lava Jato (2016)</title>
+<script src="vis-network.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root {
+    --bg: #0f1216; --panel: #171c23; --borda: #2a3240; --texto: #dfe6ee;
+    --destaque: #4ea1ff; --fraco: #8a97a8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--texto); display: flex; flex-direction: column; height: 100vh; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--borda); background: var(--panel); }
+  header h1 { margin: 0 0 6px; font-size: 18px; }
+  #filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 13px; }
+  #filtros label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  #filtros select, #filtros input[type=text] { background: #0d1117; color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 4px 8px; font-size: 13px; }
+  main { display: flex; flex: 1; min-height: 0; }
+  #mapa { flex: 1; min-height: 400px; height: 100%; position: relative; }
+  #painel { width: 340px; border-left: 1px solid var(--borda); background: var(--panel); overflow-y: auto; padding: 12px; }
+  #painel h2 { font-size: 14px; margin: 0 0 10px; color: var(--destaque); }
+  .card { border: 1px solid var(--borda); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: #12161c; cursor: pointer; }
+  .card:hover { border-color: var(--destaque); }
+  .card .titulo { font-weight: 600; font-size: 13px; }
+  .card .detalhe { font-size: 12px; color: var(--fraco); margin-top: 2px; }
+  .card.active { border-color: var(--destaque); background: #16202e; }
+  #player { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--borda); padding: 8px 16px; display: none; align-items: center; gap: 12px; }
+  #player.on { display: flex; }
+  #player audio { flex: 1; height: 36px; }
+  #playerTitulo { font-size: 13px; max-width: 320px; }
+  #player a { color: var(--destaque); font-size: 12px; white-space: nowrap; }
+  .legenda { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+  @media (max-width: 800px) { main { flex-direction: column; } #painel { width: 100%; border-left: none; border-top: 1px solid var(--borda); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mapa mental dos grampos divulgados na Lava Jato (fev–mar/2016)</h1>
+  <div id="filtros">
+    <span>Categorias:</span>
+    <span id="catBoxes"></span>
+    <span style="margin-left:12px">Assuntos:</span>
+    <span id="assuntoBoxes"></span>
+    <label>Pessoa:
+      <select id="selPessoa"><option value="">Todas</option></select>
+    </label>
+    <label>Busca: <input type="text" id="busca" placeholder="ex.: instituto, OAS..."></label>
+    <label>De: <select id="selDe"></select></label>
+    <label>Até: <select id="selAte"></select></label>
+    <button id="btnLimpar" style="background:none;border:1px solid var(--borda);color:var(--texto);border-radius:6px;padding:4px 10px;cursor:pointer;">Limpar</button>
+  </div>
+</header>
+<main>
+  <div id="mapa"></div>
+  <aside id="painel"><h2 id="painelTitulo">Conversas (clique num nó ou aresta no mapa)</h2><div id="lista"></div></aside>
+</main>
+<div id="player">
+  <span id="playerTitulo"></span>
+  <audio id="audioEl" controls></audio>
+  <a id="playerFonte" target="_blank" rel="noopener">matéria original</a>
+</div>
+<script>
+window.onerror = (msg, src, lin) => {
+  const d = document.createElement("div");
+  d.style.cssText = "position:fixed;top:0;left:0;right:0;background:#a33;color:#fff;padding:8px 12px;font:13px monospace;z-index:9999";
+  d.textContent = "Erro JS: " + msg + " (linha " + lin + ")";
+  document.body.appendChild(d);
+};
+const CAT_CORES = {
+  "Família de Lula": "#e8a33d",
+  "Instituto Lula": "#4ea1ff",
+  "Governo/Partidos": "#5cc96e",
+  "Advogados": "#c95c8a",
+  "Outros contatos": "#a07fe8",
+  "Não identificado": "#8a97a8",
+};
+const MESES = {2:"fev",3:"mar"};
+
+let grampos = window.GRAMPOS || [];
+const pessoaCat = new Map();
+const datasOrd = [];
+
+grampos.forEach(g => g.participantes.forEach(p => pessoaCat.set(p.nome, p.categoria)));
+
+function init() {
+  // datas ordenadas
+  const ordena = s => { const [d,m] = s.split("/").map(Number); return m*100+d; };
+  [...new Set(grampos.map(g => g.data))].sort((a,b)=>ordena(a)-ordena(b)).forEach(x => datasOrd.push(x));
+  const opts = datasOrd.map(x => `<option>${x}</option>`).join("");
+  selDe.innerHTML = `<option value="">início</option>` + opts;
+  selAte.innerHTML = `<option value="">fim</option>` + opts;
+  selAte.selectedIndex = datasOrd.length;
+
+  // checkboxes de categoria
+  const assuntos = [...new Set(grampos.flatMap(g => g.assuntos || []))].sort();
+  assuntoBoxes.innerHTML = assuntos.map(a =>
+    `<label><input type="checkbox" class="assunto" value="${a}">${a}</label>`).join(" ");
+  catBoxes.innerHTML = Object.keys(CAT_CORES).map(c =>
+    `<label><input type="checkbox" class="cat" value="${c}" checked><span class="legenda" style="background:${CAT_CORES[c]}"></span>${c}</label>`).join(" ");
+
+  // select de pessoas
+  [...pessoaCat.keys()].sort().forEach(p => selPessoa.add(new Option(p, p)));
+
+  document.querySelectorAll("#filtros input, #filtros select").forEach(el => el.addEventListener("input", render));
+  btnLimpar.onclick = () => {
+    document.querySelectorAll(".cat").forEach(c => c.checked = true);
+    document.querySelectorAll(".assunto").forEach(c => c.checked = false);
+    selPessoa.value = ""; busca.value = ""; selDe.value = ""; selAte.value = "";
+    render();
+  };
+  render();
+  bindCards();
+}
+
+let rede = null;
+
+function dentroPeriodo(g) {
+  const i = datasOrd.indexOf(g.data);
+  const de = selDe.value ? datasOrd.indexOf(selDe.value) : 0;
+  const ate = selAte.value ? datasOrd.indexOf(selAte.value) : datasOrd.length - 1;
+  return i >= de && i <= ate;
+}
+
+function gramposFiltrados() {
+  const cats = new Set([...document.querySelectorAll(".cat:checked")].map(c => c.value));
+  const ass = [...document.querySelectorAll(".assunto:checked")].map(c => c.value);
+  const p = selPessoa.value;
+  const q = busca.value.trim().toLowerCase();
+  return grampos.filter(g =>
+    dentroPeriodo(g) &&
+    g.participantes.some(x => cats.has(x.categoria)) &&
+    (ass.length === 0 || (g.assuntos || []).some(a => ass.includes(a))) &&
+    (!p || g.participantes.some(x => x.nome === p)) &&
+    (!q || g.descricao.toLowerCase().includes(q))
+  );
+}
+
+function cardHTML(g) {
+  const pessoas = g.participantes.map(p => `<span class="legenda" style="background:${CAT_CORES[p.categoria]}"></span>${p.nome}${p.papel ? ` <em>(${p.papel})</em>` : ""}`).join("; ");
+  return `<div class="card" data-id="${g.id}">
+    <div class="titulo">${g.data}, ${g.hora}${g.duracao ? " · " + g.duracao : ""}</div>
+    <div class="detalhe">${pessoas}</div>
+    ${(g.assuntos && g.assuntos.length) ? `<div class="detalhe" style="margin-top:4px">🏷 ${g.assuntos.join(" · ")}</div>` : ""}
+  </div>`;
+}
+
+function render() {
+  const gs = gramposFiltrados();
+  const ativos = new Set(gs.flatMap(g => g.participantes.map(p => p.nome)));
+  const nodes = [], edges = [];
+  const contagem = new Map();
+  gs.forEach(g => g.participantes.forEach(p => contagem.set(p.nome, (contagem.get(p.nome)||0)+1)));
+
+  ativos.forEach(nome => {
+    nodes.push({ id: nome, label: nome.split(" ")[0] + "\n" + nome.split(" ").slice(1).join(" "),
+      color: CAT_CORES[pessoaCat.get(nome)], value: contagem.get(nome),
+      title: `${nome} — ${contagem.get(nome)} conversa(s)`, font: { color: "#dfe6ee" } });
+  });
+
+  gs.forEach(g => {
+    const ps = g.participantes.map(p => p.nome);
+    for (let i = 0; i < ps.length; i++)
+      for (let j = i+1; j < ps.length; j++) {
+        const id = `${g.id}|${ps[i]}|${ps[j]}`;
+        edges.push({ id, from: ps[i], to: ps[j], color: { color: "#3a4453", highlight: "#4ea1ff" },
+          title: `${g.data}, ${g.hora} — ${g.descricao}`, grampo: g.id, width: 1 + Math.min(4, (g.duracaoMin||1)/10) });
+      }
+  });
+
+  if (rede) { rede.destroy(); rede = null; }
+  rede = new vis.Network(document.getElementById("mapa"),
+    { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) },
+    { nodes: { shape: "dot", scaling: { min: 10, max: 35 }, borderWidth: 0 },
+      edges: { smooth: { type: "continuous" } },
+      physics: { stabilization: true, barnesHut: { gravitationalConstant: -2500, springLength: 130 } },
+      interaction: { hover: true, tooltipDelay: 100 } });
+
+  rede.on("click", p => {
+    if (p.edges.length) tocar(p.edges[0].split("|")[0]);
+    else if (p.nodes.length) mostrarConversas(p.nodes[0]);
+  });
+  rede.on("doubleClick", p => { if (p.nodes.length) tocarDePessoa(p.nodes[0]); });
+
+  painelTitulo.textContent = `Conversas filtradas (${gs.length})`;
+  lista.innerHTML = gs.map(cardHTML).join("");
+  bindCards();
+}
+
+const listaDe = gs => gs.map(g => g.id);
+function mostrarConversas(nome) {
+  painelTitulo.textContent = `Conversas de ${nome}`;
+  const gs = grampos.filter(g => g.participantes.some(p => p.nome === nome));
+  lista.innerHTML = gs.map(cardHTML).join("");
+  bindCards();
+}
+function tocar(id) { tocarLista(id, grampos.filter(g => g.id === id)); }
+function tocarDePessoa(nome) { const gs = grampos.filter(g => g.participantes.some(p => p.nome === nome)); if (gs.length) tocarLista(gs[0].id, gs); }
+let fila = [], idxAtual = 0;
+function tocarLista(id, gs) {
+  fila = gs; idxAtual = gs.findIndex(g => g.id === id);
+  playAtual();
+}
+function playAtual() {
+  const g = fila[idxAtual]; if (!g) return;
+  playerTitulo.textContent = `${g.data}, ${g.hora} — ${g.descricao} (${idxAtual+1}/${fila.length})`;
+  playerFonte.href = g.fonte;
+  audioEl.src = g.audio;
+  player.classList.add("on");
+  audioEl.play().catch(()=>{});
+  document.querySelectorAll(".card").forEach(c => c.classList.toggle("active", c.dataset.id === g.id));
+}
+audioEl.addEventListener("ended", () => { if (idxAtual < fila.length - 1) { idxAtual++; playAtual(); } });
+
+function bindCards() {
+  document.querySelectorAll(".card").forEach(c => c.onclick = () => {
+    const g = grampos.find(x => x.id === c.dataset.id);
+    // fila: conversas entre as mesmas pessoas
+    const chave = g.participantes.map(p => p.nome).sort().join("|");
+    tocarLista(g.id, grampos.filter(x => x.participantes.map(p => p.nome).sort().join("|") === chave));
+  });
+}
+
+init();
+</script>
+</body>
+</html>
