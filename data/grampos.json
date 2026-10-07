@@ -48,7 +48,6 @@
    }
   ],
   "assuntos": [
-   "Triplex / OAS",
    "Sítio de Atibaia",
    "Lava Jato / Justiça",
    "Campanha / propaganda",
@@ -78,7 +77,9 @@
     "categoria": "Família de Lula"
    }
   ],
-  "assuntos": [],
+  "assuntos": [
+   "Sítio de Atibaia"
+  ],
   "trecho": "(O DIÁLOGO COMEÇA A 1:57 DA GRAVAÇÃO)\nLILS: LUIZA tá bem?\nVAVA: Tá tudo bem, tá joia. Aqui ta eu, o MARCIO, a LIVIA, a ADRIANA.\nLILS: Dê um beijão\nVAVA: Visita aqui não falta. No dia que você quiser, passe!\nLILS:Não, eu vou ver aqui, vou ver, eu vou ver.",
   "contexto": "Conversa entre Lula, Vavá. Temas detectados: assuntos diversos."
  },
@@ -197,7 +198,6 @@
    }
   ],
   "assuntos": [
-   "Triplex / OAS",
    "Lava Jato / Justiça",
    "Governo Dilma / cargo"
   ],
@@ -493,9 +493,7 @@
     "categoria": "Não identificado"
    }
   ],
-  "assuntos": [
-   "Lava Jato / Justiça"
-  ],
+  "assuntos": [],
   "trecho": "KALIL : Eu vi, FÁBIO.\nKALIL: Eu vi, mas, cara, é terrorismo, é um monte de coisa\nFÁBIO: Desencana, meu. Não to preocupado com isso, não.\nKALIL: Se sai uma coisa dessas, é o estado policial, né? Sabe?\nFÁBIO: Totalmente.\nKALIL: Sem critérios.",
   "contexto": "Conversa entre Lula, Fábio Silva, Kalil Bittar. Temas detectados: Lava Jato / Justiça."
  },
@@ -520,9 +518,7 @@
     "categoria": "Governo/Partidos"
    }
   ],
-  "assuntos": [
-   "Triplex / OAS"
-  ],
+  "assuntos": [],
   "trecho": "MORAES: Boa tarde! Eu gostaria de falar com DAISE.\nDAISE: É a DAISE.\nMORAES: O, DAISE, é o MORAES. Caiu a ligação.\nDAISE: Tudo bom?\nMORAES: Tudo bom.\nDAISE: Um minutinho por favor.",
   "contexto": "Lula fala com Vagner Freitas, presidente da CUT, sobre a crise e a mobilização de sindicalistas. Foi um dos primeiros áudios divulgados, explorado como prova de articulação política em meio ao processo contra Lula."
  },
@@ -552,7 +548,9 @@
     "categoria": "Não identificado"
    }
   ],
-  "assuntos": [],
+  "assuntos": [
+   "Sítio de Atibaia"
+  ],
   "trecho": "FÁBIO: E aí?\nKALIL: Não.. Eu vou ver se eu convenço o FABIANO a vir pra cá.\nFÁBIO: É uma boa.\nKALIL: Tá? Eu tenho sua autorização pra isso, sim? Alô? Alô?\nFÁBIO: Tô ouvindo.\nKALIL: Eu tenho sua autorização pra isso?",
   "contexto": "Conversa entre Lula, Fábio Silva, Kalil Bittar. Temas detectados: assuntos diversos."
  },
@@ -620,7 +618,7 @@
    }
   ],
   "assuntos": [
-   "Triplex / OAS"
+   "Sítio de Atibaia"
   ],
   "trecho": "KALIL: (ininteligível)\nFÁBIO: Manda aí.\nKALIL: Não.. falei com a LILIAN por SMS, tá?\nFÁBIO: Ãn.. tudo certo?\nKALIL: Ela vai (..) nosso amigo deles lá.. e eu to montando uma equipe pra lá, tá?\nFÁBIO: Legal. E que horas você vai?",
   "contexto": "Conversa entre Lula, Fábio Silva, Kalil Bittar. Temas detectados: Triplex / OAS."
@@ -647,7 +645,7 @@
    }
   ],
   "assuntos": [
-   "Lava Jato / Justiça"
+   "Governo Dilma / cargo"
   ],
   "trecho": "MNI: \"ILCA\".\nMORAES: É o MORAES.\nMNI: Oi MORAES.\nMORAES: Posso falar com o Dr. ROBERTO rapidinho?\nMORAES: Obrigado.\nROBERTO: Alô.",
   "contexto": "Conversa entre Lula, Roberto Teixeira. Temas detectados: Lava Jato / Justiça."
@@ -701,7 +699,6 @@
    }
   ],
   "assuntos": [
-   "Triplex / OAS",
    "Campanha / propaganda",
    "Governo Dilma / cargo"
   ],
@@ -729,9 +726,7 @@
     "categoria": "Advogados"
    }
   ],
-  "assuntos": [
-   "Lava Jato / Justiça"
-  ],
+  "assuntos": [],
   "trecho": "(O DIÁLOGO COMEÇA A 1:45 DA GRAVAÇÃO)\nLILS: O, ROBERTO!\nROBERTO: Olá.\nLILS: É o seguinte. Não tem tempo da gente de se encontrar porque eu tô a quarenta e cinco minutos da onde ele tá. E ele tem uma hora pra ir pro aeroporto. Então não dá pra se encontrar. Mas o CRISTIANO tava tentando ligar pra ele. Ele ia atender o CRISTIANO.\nROBERTO: Sim, mas aí é que tá. Mas ele vai ter que...Ele não sei se ele vai poder ir pra lá. Ele tem que trabalhar.\nLILS: Não. Ele tá indo pra Brasília caralho!",
   "contexto": "Conversa entre Lula, Roberto Teixeira. Temas detectados: Lava Jato / Justiça."
  },
@@ -756,9 +751,7 @@
     "categoria": "Advogados"
    }
   ],
-  "assuntos": [
-   "Lava Jato / Justiça"
-  ],
+  "assuntos": [],
   "trecho": "NILVA: NILVA.\nMORAES: Fala, NILVA. Deixa eu falar com o doutor ROBERTO? É o MORAES. Obrigado.\nNILVA: De nada.\nROBERTO: Oh, MORAES.\nMORAES:  Oh,  Doutor.  Eu  vou  passar  pro  Presidente. A  pessoa  falou  que  já  falou  com  o  doutor CRISTIANO né?\nROBERTO: Já falou.",
   "contexto": "Conversa entre Lula, Roberto Teixeira. Temas detectados: Lava Jato / Justiça."
  },
@@ -1185,7 +1178,6 @@
    }
   ],
   "assuntos": [
-   "Triplex / OAS",
    "Sítio de Atibaia",
    "Lava Jato / Justiça",
    "Governo Dilma / cargo"
@@ -1329,9 +1321,7 @@
     "categoria": "Governo/Partidos"
    }
   ],
-  "assuntos": [
-   "Triplex / OAS"
-  ],
+  "assuntos": [],
   "trecho": "MORAES: Alô?!\nHNI: Tenente MORAES?\nMORAES: Sim, pois!?\nHNI: Governador WELLINGTON DIAS gostaria de falar com o senhor, tudo bem?!\nMORAES: Tudo bem.\nWELLIGTON DIAS: Meu jovem!",
   "contexto": "Conversa entre Lula, Wellington Dias. Temas detectados: Triplex / OAS."
  },
@@ -1472,7 +1462,8 @@
    }
   ],
   "assuntos": [
-   "Instituto Lula / acervo"
+   "Instituto Lula / acervo",
+   "Governo Dilma / cargo"
   ],
   "trecho": "MARCO AURÉLIO: Boa noite MORAES .\nMORAES: Fala, MARCO AURELIO?! Tudo bem?!\nMARCO AURELIO: Tudo bem.\nMORAES: O PRESIDENTE quer falar com você, ta?! Só um minuto, por favor.\nMARCO AURELIO: Beleza, pode passar.\nMARCO AURELIO: Oi PRESIDENTE, tudo bem?!",
   "contexto": "Conversa entre Lula, Instituto Lula, Marco Aurélio. Temas detectados: Instituto Lula / acervo."
@@ -1498,9 +1489,7 @@
     "categoria": "Governo/Partidos"
    }
   ],
-  "assuntos": [
-   "Lava Jato / Justiça"
-  ],
+  "assuntos": [],
   "trecho": "VAGNER: Oi...\nMORAES: Sr. VAGNER!\nVAGNER: Oi!\nMORAES: O PRESIDENTE quer falar com o Senhor.\nVAGNER: Tudo bem?\nLILS: Querido companheiro! Tudo bem?",
   "contexto": "Mais uma conversa de Lula com Vagner Freitas (CUT), em meio às manifestações de apoio e à escalada da crise política de março/2016."
  },
@@ -1525,10 +1514,7 @@
     "categoria": "Governo/Partidos"
    }
   ],
-  "assuntos": [
-   "Triplex / OAS",
-   "Lava Jato / Justiça"
-  ],
+  "assuntos": [],
   "trecho": "MORAES: VAGNER? Vou passar a ligação.\nVAGNER: \"Araujo\".\nLILS: Viu meu querido?\nVAGNER: Oi meu querido...\nLILS: É muita tranquilidade... Eu acho que o ato \"deles\" de domingo não vai ser tão forte.\nVAGNER: Eu também acho que não...",
   "contexto": "Conversa entre Lula, Vagner Freitas. Temas detectados: Triplex / OAS, Lava Jato / Justiça."
  }
