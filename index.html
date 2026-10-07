@@ -49,8 +49,11 @@
     <span id="catBoxes"></span>
     <span style="margin-left:12px">Assuntos:</span>
     <span id="assuntoBoxes"></span>
-    <label>Pessoa:
-      <select id="selPessoa"><option value="">Todas</option></select>
+    <label>Pessoas:
+      <details id="pessoasBox" style="display:inline-block;position:relative">
+        <summary style="cursor:pointer;background:#0d1117;border:1px solid var(--borda);border-radius:6px;padding:4px 8px;list-style:none;">selecionar…</summary>
+        <div id="pessoaChecks" style="position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--borda);border-radius:8px;padding:10px;z-index:100;max-height:300px;overflow-y:auto;width:260px"></div>
+      </details>
     </label>
     <label>Busca: <input type="text" id="busca" placeholder="ex.: instituto, OAS..."></label>
     <label>De: <select id="selDe"></select></label>
@@ -109,14 +112,19 @@ function init() {
   catBoxes.innerHTML = Object.keys(CAT_CORES).map(c =>
     `<label><input type="checkbox" class="cat" value="${c}" checked><span class="legenda" style="background:${CAT_CORES[c]}"></span>${c}</label>`).join(" ");
 
-  // select de pessoas
-  [...pessoaCat.keys()].sort().forEach(p => selPessoa.add(new Option(p, p)));
+  // seleção de pessoas (checkboxes agrupadas por categoria)
+  const porCat = {};
+  [...pessoaCat.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n,c]) => (porCat[c] ||= []).push(n));
+  pessoaChecks.innerHTML = Object.entries(porCat).map(([c, nomes]) =>
+    `<div style="margin-bottom:6px"><div style="color:${CAT_CORES[c]};font-size:11px;text-transform:uppercase;margin-bottom:2px">${c}</div>` +
+    nomes.map(n => `<label style="display:block;font-size:13px"><input type="checkbox" class="pessoa" value="${n}"> ${n}</label>`).join("") + `</div>`).join("");
 
   document.querySelectorAll("#filtros input, #filtros select").forEach(el => el.addEventListener("input", render));
   btnLimpar.onclick = () => {
     document.querySelectorAll(".cat").forEach(c => c.checked = true);
     document.querySelectorAll(".assunto").forEach(c => c.checked = false);
-    selPessoa.value = ""; busca.value = ""; selDe.value = ""; selAte.value = "";
+    document.querySelectorAll(".pessoa").forEach(c => c.checked = false);
+    busca.value = ""; selDe.value = ""; selAte.value = "";
     render();
   };
   render();
@@ -144,13 +152,13 @@ function ordenaTemporal(gs) {
 function gramposFiltrados() {
   const cats = new Set([...document.querySelectorAll(".cat:checked")].map(c => c.value));
   const ass = [...document.querySelectorAll(".assunto:checked")].map(c => c.value);
-  const p = selPessoa.value;
+  const pess = [...document.querySelectorAll(".pessoa:checked")].map(c => c.value);
   const q = busca.value.trim().toLowerCase();
   return grampos.filter(g =>
     dentroPeriodo(g) &&
     g.participantes.some(x => cats.has(x.categoria)) &&
     (ass.length === 0 || (g.assuntos || []).some(a => ass.includes(a))) &&
-    (!p || g.participantes.some(x => x.nome === p)) &&
+    (pess.length === 0 || g.participantes.some(x => pess.includes(x.nome))) &&
     (!q || g.descricao.toLowerCase().includes(q))
   );
 }
@@ -171,9 +179,12 @@ function render() {
   const contagem = new Map();
   gs.forEach(g => g.participantes.forEach(p => contagem.set(p.nome, (contagem.get(p.nome)||0)+1)));
 
+  const selecionados = new Set([...document.querySelectorAll(".pessoa:checked")].map(c => c.value));
   ativos.forEach(nome => {
     nodes.push({ id: nome, label: nome.split(" ")[0] + "\n" + nome.split(" ").slice(1).join(" "),
-      color: CAT_CORES[pessoaCat.get(nome)], value: contagem.get(nome),
+      color: { background: CAT_CORES[pessoaCat.get(nome)], border: selecionados.has(nome) ? "#ffffff" : CAT_CORES[pessoaCat.get(nome)] },
+      borderWidth: selecionados.has(nome) ? 3 : 0,
+      value: contagem.get(nome),
       title: `${nome} — ${contagem.get(nome)} conversa(s)`, font: { color: "#dfe6ee" } });
   });
 
