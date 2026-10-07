@@ -245,7 +245,9 @@ function playAtual() {
   playerTitulo.textContent = `${g.data}, ${g.hora} — ${g.descricao} (${idxAtual+1}/${fila.length})`;
   playerFonte.href = g.fonte;
   const tr = g.transcricao || g.trecho;
-  const rotulo = g.transcricao_whisper ? "Transcrição automática (Whisper)" : "Transcrição completa";
+  const rotulo = g.transcricao_whisper
+    ? (g.rotulo_falantes_auto ? "Transcrição automática (Whisper) — falantes identificados por contexto, pode conter imprecisões" : "Transcrição automática (Whisper)")
+    : "Transcrição completa";
   detalhe.innerHTML = `<h2>${g.data}, ${g.hora} — ${g.descricao}</h2>
     ${g.duracao ? `<div class="vazio" style="margin-bottom:8px">Duração: ${g.duracao}</div>` : ""}
     <div class="resumo">${g.contexto || ""}</div>
