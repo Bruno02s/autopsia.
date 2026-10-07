@@ -6,7 +6,7 @@ Ver por si mesmo. Em latim, *autopsia* é exatamente isso: testemunho direto, se
 
 Em 2016, a Lava Jato divulgou 52 gravações de escutas telefônicas envolvendo o ex-presidente Lula. O que chegou ao público, na maior parte das vezes, foram cortes — fragmentos escolhidos, fora do contexto, servidos com manchete pronta.
 
-O estopim deste projeto foi pessoal: ouvi um trecho da conversa entre Lula e o prefeito Eduardo Paes e o enviei a um amigo, que o usou para declarar a inocência de Lula. Só depois descobri que o áudio estava incompleto — na íntegra, Paes liga para consolar Lula sobre um escândalo "sem fundamento" e, no meio da conversa, ironiza por que ele teria comprado um sítio e uns barcos "num lugar daquele". O corte contava outra história.
+O estopim deste projeto foi pessoal: ouvi um trecho da conversa entre Lula e o prefeito Eduardo Paes e o enviei a um amigo, que eu usei para declarar a culpa de Lula. Só depois descobri que o áudio estava incompleto — na íntegra, Paes liga para consolar Lula sobre um escândalo "sem fundamento" e, no meio da conversa, ironiza por que ele teria comprado um sítio e uns barcos "num lugar daquele". O corte contava outra história.
 
 Decidi então construir um lugar onde qualquer pessoa pode ouvir os áudios **na íntegra**, navegar pelas conversas por pessoas, datas e assuntos (Triplex/OAS, Sítio de Atibaia, Odebrecht, Lava Jato, Instituto Lula, campanha, cargos no governo) e chegar às suas próprias conclusões — sem a manipulação direta da mídia.
 
