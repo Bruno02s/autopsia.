@@ -36,7 +36,7 @@
   #playerCtx { font-size: 12.5px; color: var(--fraco); line-height: 1.45; margin-top: 4px; }
   #playerCtx details { margin-top: 4px; }
   #playerCtx summary { cursor: pointer; color: var(--destaque); }
-  #playerCtx .falas { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 11.5px; margin-top: 4px; color: #b8c3d0; max-height: 120px; overflow-y: auto; }
+  #playerCtx .falas { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 11.5px; margin-top: 4px; color: #b8c3d0; max-height: 200px; overflow-y: auto; }
   .legenda { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
   @media (max-width: 800px) { main { flex-direction: column; } #painel { width: 100%; border-left: none; border-top: 1px solid var(--borda); } }
 </style>
@@ -235,8 +235,9 @@ function playAtual() {
   const g = fila[idxAtual]; if (!g) return;
   playerTitulo.textContent = `${g.data}, ${g.hora} — ${g.descricao} (${idxAtual+1}/${fila.length})`;
   playerFonte.href = g.fonte;
+  const tr = g.transcricao || g.trecho;
   playerCtx.innerHTML = (g.contexto ? `<div>${g.contexto}</div>` : "") +
-    (g.trecho ? `<details><span class="falas">${g.trecho.replace(/</g,"&lt;")}</span><summary>Início da transcrição</summary></details>` : "");
+    (tr ? `<details><span class="falas">${tr.replace(/</g,"&lt;")}</span><summary>Transcrição completa</summary></details>` : "");
   audioEl.src = g.audio;
   player.classList.add("on");
   audioEl.play().catch(()=>{});
