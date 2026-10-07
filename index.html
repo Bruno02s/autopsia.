@@ -132,6 +132,15 @@ function dentroPeriodo(g) {
   return i >= de && i <= ate;
 }
 
+function ordenaTemporal(gs) {
+  const chave = g => {
+    const [d, m] = g.data.split("/").map(Number);
+    const h = g.hora.match(/(\d+)h(\d+)/);
+    return m * 100000 + d * 10000 + (h ? (+h[1]) * 100 + (+h[2]) : 0);
+  };
+  return [...gs].sort((a, b) => chave(a) - chave(b));
+}
+
 function gramposFiltrados() {
   const cats = new Set([...document.querySelectorAll(".cat:checked")].map(c => c.value));
   const ass = [...document.querySelectorAll(".assunto:checked")].map(c => c.value);
@@ -193,7 +202,7 @@ function render() {
   rede.on("doubleClick", p => { if (p.nodes.length) tocarDePessoa(p.nodes[0]); });
 
   painelTitulo.textContent = `Conversas filtradas (${gs.length})`;
-  lista.innerHTML = gs.map(cardHTML).join("");
+  lista.innerHTML = ordenaTemporal(gs).map(cardHTML).join("");
   bindCards();
 }
 
@@ -201,7 +210,7 @@ const listaDe = gs => gs.map(g => g.id);
 function mostrarConversas(nome) {
   painelTitulo.textContent = `Conversas de ${nome}`;
   const gs = grampos.filter(g => g.participantes.some(p => p.nome === nome));
-  lista.innerHTML = gs.map(cardHTML).join("");
+  lista.innerHTML = ordenaTemporal(gs).map(cardHTML).join("");
   bindCards();
 }
 function tocar(id) { tocarLista(id, grampos.filter(g => g.id === id)); }
