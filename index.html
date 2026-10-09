@@ -15,14 +15,16 @@
   body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--texto); display: flex; flex-direction: column; height: 100vh; }
   header { padding: 10px 16px; border-bottom: 1px solid var(--borda); background: var(--panel); }
   header h1 { margin: 0 0 6px; font-size: 18px; }
-  #filtros { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; font-size: 13px; overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
+  #filtros { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; font-size: 13px; white-space: nowrap; padding-bottom: 2px; }
   #filtros > * { flex-shrink: 0; }
+  .dd { position: relative; }
   .dd details { position: relative; display: inline-block; }
-  .dd summary { cursor: pointer; background: #0d1117; border: 1px solid var(--borda); border-radius: 6px; padding: 4px 10px; list-style: none; font-size: 13px; }
+  .dd summary { display: inline-block; cursor: pointer; background: #0d1117; border: 1px solid var(--borda); border-radius: 6px; padding: 4px 10px; list-style: none; font-size: 13px; }
+  .dd summary::-webkit-details-marker { display: none; }
   .dd summary::after { content: " ▾"; color: var(--fraco); font-size: 11px; }
   .dd details[open] summary { border-color: var(--destaque); }
-  .dd-panel { position: absolute; top: 110%; left: 0; background: var(--panel); border: 1px solid var(--borda); border-radius: 8px; padding: 10px; z-index: 200; max-height: 280px; overflow-y: auto; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,.5); white-space: normal; }
-  .dd-panel label { display: flex !important; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
+  .dd-panel { position: absolute; top: calc(100% + 6px); left: 0; background: var(--panel); border: 1px solid var(--borda); border-radius: 8px; padding: 10px; z-index: 200; max-height: 300px; overflow-y: auto; min-width: 230px; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,.6); white-space: normal; }
+  .dd-panel label { display: flex !important; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; white-space: nowrap; }
   #filtros label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   #filtros select, #filtros input[type=text] { background: #0d1117; color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 4px 8px; font-size: 13px; }
   main { display: flex; flex: 1; min-height: 0; }
@@ -43,8 +45,7 @@
   .card.tocando { border-color: #5cc96e; background: #14231a; box-shadow: 0 0 0 1px #5cc96e inset; }
   .card.tocando::before { content: "▶ "; color: #5cc96e; }
   .card.envolvida { border-color: #e8c34a; }
-  #player { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--borda); padding: 8px 16px; display: none; align-items: center; gap: 12px; }
-  #player.on { display: flex; }
+  #player { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--borda); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
   #player audio { flex: 1; height: 36px; }
   #playerTitulo { font-size: 13px; max-width: 320px; }
   #player a { color: var(--destaque); font-size: 12px; white-space: nowrap; }
@@ -62,24 +63,24 @@
 <header>
   <h1>Mapa mental dos grampos divulgados na Lava Jato (fev–mar/2016)</h1>
   <div id="filtros">
-    <label class="dd">
+    <span class="dd">
       <details>
         <summary>Categorias</summary>
         <div class="dd-panel" id="catBoxes"></div>
       </details>
-    </label>
-    <label class="dd">
+    </span>
+    <span class="dd">
       <details>
         <summary>Assuntos</summary>
         <div class="dd-panel" id="assuntoBoxes"></div>
       </details>
-    </label>
-    <label class="dd">
+    </span>
+    <span class="dd">
       <details>
         <summary>Pessoas</summary>
         <div class="dd-panel" id="pessoaChecks"></div>
       </details>
-    </label>
+    </span>
     <label>Busca: <input type="text" id="busca" placeholder="ex.: instituto, OAS..."></label>
     <label>De: <select id="selDe"></select></label>
     <label>Até: <select id="selAte"></select></label>
@@ -142,7 +143,10 @@ function init() {
     `<div style="margin-bottom:6px"><div style="color:${CAT_CORES[c]};font-size:11px;text-transform:uppercase;margin-bottom:2px">${c}</div>` +
     nomes.map(n => `<label style="display:block;font-size:13px"><input type="checkbox" class="pessoa" value="${n}"> ${n}</label>`).join("") + `</div>`).join("");
 
-  document.querySelectorAll("#filtros input, #filtros select").forEach(el => el.addEventListener("input", render));
+  document.querySelectorAll("#filtros input, #filtros select").forEach(el => {
+    el.addEventListener("input", render);
+    el.addEventListener("change", render);
+  });
   btnLimpar.onclick = () => {
     document.querySelectorAll(".cat").forEach(c => c.checked = true);
     document.querySelectorAll(".assunto").forEach(c => c.checked = false);
