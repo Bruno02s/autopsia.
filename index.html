@@ -222,8 +222,14 @@ function render() {
     { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) },
     { nodes: { shape: "dot", scaling: { min: 10, max: 35 }, borderWidth: 0 },
       edges: { smooth: { type: "continuous" } },
-      physics: { stabilization: { iterations: 250 }, barnesHut: { gravitationalConstant: -2500, springLength: 130 } },
+      physics: { stabilization: { iterations: 250 }, barnesHut: { gravitationalConstant: -2200, springLength: 240, springConstant: 0.03 } },
       interaction: { hover: true, tooltipDelay: 100, dragView: true, zoomView: true } });
+
+  // limita o zoom: nem infinito pra fora nem demais pra dentro
+  rede.on("zoom", ({ scale }) => {
+    if (scale < 0.25) rede.moveTo({ scale: 0.25 });
+    else if (scale > 2.5) rede.moveTo({ scale: 2.5 });
+  });
 
   // depois de organizar, desliga a física: nós ficam onde o usuário arrumar
   rede.once("stabilizationIterationsDone", () => rede.setOptions({ physics: false }));
