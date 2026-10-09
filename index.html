@@ -222,7 +222,8 @@ function render() {
     { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) },
     { nodes: { shape: "dot", scaling: { min: 10, max: 35 }, borderWidth: 0 },
       edges: { smooth: { type: "continuous" } },
-      physics: { stabilization: { iterations: 250 }, barnesHut: { gravitationalConstant: -2200, springLength: 240, springConstant: 0.03 } },
+      physics: { stabilization: { iterations: 600 },
+        barnesHut: { gravitationalConstant: -4200, centralGravity: 0.25, springLength: 280, springConstant: 0.015, damping: 0.25, avoidOverlap: 0.35 } },
       interaction: { hover: true, tooltipDelay: 100, dragView: true, zoomView: true } });
 
   // limita o zoom: nem infinito pra fora nem demais pra dentro
