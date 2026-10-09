@@ -15,7 +15,14 @@
   body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--texto); display: flex; flex-direction: column; height: 100vh; }
   header { padding: 10px 16px; border-bottom: 1px solid var(--borda); background: var(--panel); }
   header h1 { margin: 0 0 6px; font-size: 18px; }
-  #filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 13px; }
+  #filtros { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; font-size: 13px; overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
+  #filtros > * { flex-shrink: 0; }
+  .dd details { position: relative; display: inline-block; }
+  .dd summary { cursor: pointer; background: #0d1117; border: 1px solid var(--borda); border-radius: 6px; padding: 4px 10px; list-style: none; font-size: 13px; }
+  .dd summary::after { content: " ▾"; color: var(--fraco); font-size: 11px; }
+  .dd details[open] summary { border-color: var(--destaque); }
+  .dd-panel { position: absolute; top: 110%; left: 0; background: var(--panel); border: 1px solid var(--borda); border-radius: 8px; padding: 10px; z-index: 200; max-height: 280px; overflow-y: auto; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,.5); white-space: normal; }
+  .dd-panel label { display: flex !important; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
   #filtros label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   #filtros select, #filtros input[type=text] { background: #0d1117; color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 4px 8px; font-size: 13px; }
   main { display: flex; flex: 1; min-height: 0; }
@@ -55,14 +62,22 @@
 <header>
   <h1>Mapa mental dos grampos divulgados na Lava Jato (fev–mar/2016)</h1>
   <div id="filtros">
-    <span>Categorias:</span>
-    <span id="catBoxes"></span>
-    <span style="margin-left:12px">Assuntos:</span>
-    <span id="assuntoBoxes"></span>
-    <label>Pessoas:
-      <details id="pessoasBox" style="display:inline-block;position:relative">
-        <summary style="cursor:pointer;background:#0d1117;border:1px solid var(--borda);border-radius:6px;padding:4px 8px;list-style:none;">selecionar…</summary>
-        <div id="pessoaChecks" style="position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--borda);border-radius:8px;padding:10px;z-index:100;max-height:300px;overflow-y:auto;width:260px"></div>
+    <label class="dd">
+      <details>
+        <summary>Categorias</summary>
+        <div class="dd-panel" id="catBoxes"></div>
+      </details>
+    </label>
+    <label class="dd">
+      <details>
+        <summary>Assuntos</summary>
+        <div class="dd-panel" id="assuntoBoxes"></div>
+      </details>
+    </label>
+    <label class="dd">
+      <details>
+        <summary>Pessoas</summary>
+        <div class="dd-panel" id="pessoaChecks"></div>
       </details>
     </label>
     <label>Busca: <input type="text" id="busca" placeholder="ex.: instituto, OAS..."></label>
@@ -223,6 +238,16 @@ function render() {
   painelTitulo.textContent = `Conversas filtradas (${gs.length})`;
   lista.innerHTML = ordenaTemporal(gs).map(cardHTML).join("");
   bindCards();
+  // selos nos dropdowns com quantidade de itens marcados
+  const selos = [
+    [catBoxes, "Categorias", ".cat"],
+    [assuntoBoxes, "Assuntos", ".assunto"],
+    [pessoaChecks, "Pessoas", ".pessoa"],
+  ];
+  selos.forEach(([el, nome, sel]) => {
+    const n = el.querySelectorAll(sel + ":checked").length;
+    el.closest("details").querySelector("summary").textContent = n ? `${nome} (${n})` : nome;
+  });
 }
 
 const listaDe = gs => gs.map(g => g.id);
@@ -295,6 +320,13 @@ function bindCards() {
 }
 
 init();
+
+// fecha dropdowns ao clicar fora
+document.addEventListener("click", e => {
+  document.querySelectorAll(".dd details[open]").forEach(d => {
+    if (!d.contains(e.target)) d.removeAttribute("open");
+  });
+});
 </script>
 </body>
 </html>
