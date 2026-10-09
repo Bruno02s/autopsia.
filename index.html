@@ -61,7 +61,7 @@
 </head>
 <body>
 <header>
-  <h1>Mapa mental dos grampos divulgados na Lava Jato (fev–mar/2016)</h1>
+  <h1>Caso Lava Jato</h1>
   <div id="filtros">
     <span class="dd">
       <details>
@@ -73,12 +73,6 @@
       <details>
         <summary>Assuntos</summary>
         <div class="dd-panel" id="assuntoBoxes"></div>
-      </details>
-    </span>
-    <span class="dd">
-      <details>
-        <summary>Pessoas</summary>
-        <div class="dd-panel" id="pessoaChecks"></div>
       </details>
     </span>
     <label>Busca: <input type="text" id="busca" placeholder="ex.: instituto, OAS..."></label>
@@ -137,11 +131,6 @@ function init() {
     `<label><input type="checkbox" class="cat" value="${c}" checked><span class="legenda" style="background:${CAT_CORES[c]}"></span>${c}</label>`).join(" ");
 
   // seleção de pessoas (checkboxes agrupadas por categoria)
-  const porCat = {};
-  [...pessoaCat.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n,c]) => (porCat[c] ||= []).push(n));
-  pessoaChecks.innerHTML = Object.entries(porCat).map(([c, nomes]) =>
-    `<div style="margin-bottom:6px"><div style="color:${CAT_CORES[c]};font-size:11px;text-transform:uppercase;margin-bottom:2px">${c}</div>` +
-    nomes.map(n => `<label style="display:block;font-size:13px"><input type="checkbox" class="pessoa" value="${n}"> ${n}</label>`).join("") + `</div>`).join("");
 
   document.querySelectorAll("#filtros input, #filtros select").forEach(el => {
     el.addEventListener("input", render);
@@ -150,7 +139,6 @@ function init() {
   btnLimpar.onclick = () => {
     document.querySelectorAll(".cat").forEach(c => c.checked = true);
     document.querySelectorAll(".assunto").forEach(c => c.checked = false);
-    document.querySelectorAll(".pessoa").forEach(c => c.checked = false);
     busca.value = ""; selDe.value = ""; selAte.value = "";
     render();
   };
@@ -179,13 +167,11 @@ function ordenaTemporal(gs) {
 function gramposFiltrados() {
   const cats = new Set([...document.querySelectorAll(".cat:checked")].map(c => c.value));
   const ass = [...document.querySelectorAll(".assunto:checked")].map(c => c.value);
-  const pess = [...document.querySelectorAll(".pessoa:checked")].map(c => c.value);
   const q = busca.value.trim().toLowerCase();
   return grampos.filter(g =>
     dentroPeriodo(g) &&
     g.participantes.some(x => cats.has(x.categoria)) &&
     (ass.length === 0 || (g.assuntos || []).some(a => ass.includes(a))) &&
-    (pess.length === 0 || g.participantes.some(x => pess.includes(x.nome))) &&
     (!q || g.descricao.toLowerCase().includes(q))
   );
 }
@@ -206,13 +192,19 @@ function render() {
   const contagem = new Map();
   gs.forEach(g => g.participantes.forEach(p => contagem.set(p.nome, (contagem.get(p.nome)||0)+1)));
 
-  const selecionados = new Set([...document.querySelectorAll(".pessoa:checked")].map(c => c.value));
+  // preserva posições que o usuário arrumou antes de re-renderizar
+  const posicoes = {};
+  if (rede) rede.body.data.nodes.getIds().forEach(id => { posicoes[id] = rede.getPositions([id])[id]; });
+
+  const selecionados = new Set(pessoaMarcada ? [pessoaMarcada] : []);
   ativos.forEach(nome => {
-    nodes.push({ id: nome, label: nome.split(" ")[0] + "\n" + nome.split(" ").slice(1).join(" "),
+    const node = { id: nome, label: nome.split(" ")[0] + "\n" + nome.split(" ").slice(1).join(" "),
       color: { background: CAT_CORES[pessoaCat.get(nome)], border: selecionados.has(nome) ? "#ffffff" : CAT_CORES[pessoaCat.get(nome)] },
       borderWidth: selecionados.has(nome) ? 3 : 0,
       value: contagem.get(nome),
-      title: `${nome} — ${contagem.get(nome)} conversa(s)`, font: { color: "#dfe6ee" } });
+      title: `${nome} — ${contagem.get(nome)} conversa(s)`, font: { color: "#dfe6ee" } };
+    if (posicoes[nome]) { node.x = posicoes[nome].x; node.y = posicoes[nome].y; }
+    nodes.push(node);
   });
 
   gs.forEach(g => {
@@ -230,12 +222,16 @@ function render() {
     { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) },
     { nodes: { shape: "dot", scaling: { min: 10, max: 35 }, borderWidth: 0 },
       edges: { smooth: { type: "continuous" } },
-      physics: { stabilization: true, barnesHut: { gravitationalConstant: -2500, springLength: 130 } },
-      interaction: { hover: true, tooltipDelay: 100 } });
+      physics: { stabilization: { iterations: 250 }, barnesHut: { gravitationalConstant: -2500, springLength: 130 } },
+      interaction: { hover: true, tooltipDelay: 100, dragView: true, zoomView: true } });
+
+  // depois de organizar, desliga a física: nós ficam onde o usuário arrumar
+  rede.once("stabilizationIterationsDone", () => rede.setOptions({ physics: false }));
 
   rede.on("click", p => {
     if (p.nodes.length) marcarConversasDe(p.nodes[0]);
     else if (p.edges.length) tocar(p.edges[0].split("|")[0]);
+    else limparMarcacao();
   });
   rede.on("doubleClick", p => { if (p.nodes.length) marcarConversasDe(p.nodes[0]); });
 
@@ -246,7 +242,6 @@ function render() {
   const selos = [
     [catBoxes, "Categorias", ".cat"],
     [assuntoBoxes, "Assuntos", ".assunto"],
-    [pessoaChecks, "Pessoas", ".pessoa"],
   ];
   selos.forEach(([el, nome, sel]) => {
     const n = el.querySelectorAll(sel + ":checked").length;
@@ -268,19 +263,22 @@ function marcarConversasDe(nome) {
     else upd.push({ id: eid, color: { color: "#3a4453", highlight: "#4ea1ff" }, width: 1.4 });
   });
   rede.body.data.edges.update(upd);
-  // marca os cards no painel
+  // marca os cards no painel (sem filtrar a lista)
   document.querySelectorAll(".card").forEach(c =>
     c.classList.toggle("envolvida", ids.has(c.dataset.id)));
-  mostrarConversas(nome);
+  const total = lista.querySelectorAll(".card").length;
+  painelTitulo.textContent = pessoaMarcada
+    ? `Conversas (${ids.size} envolvidas com ${pessoaMarcada} de ${total})`
+    : "Conversas";
 }
-function mostrarConversas(nome) {
-  painelTitulo.textContent = `Conversas de ${nome}`;
-  const gs = ordenaTemporal(grampos.filter(g => g.participantes.some(p => p.nome === nome)));
-  lista.innerHTML = gs.map(cardHTML).join("");
-  const ids = new Set(gs.map(g => g.id));
-  document.querySelectorAll(".card").forEach(c =>
-    c.classList.toggle("envolvida", ids.has(c.dataset.id)));
-  bindCards();
+function limparMarcacao() {
+  pessoaMarcada = null;
+  const upd = rede.body.data.edges.getIds().map(eid => ({
+    id: eid, color: { color: "#3a4453", highlight: "#4ea1ff" }, width: 1.4 }));
+  rede.body.data.edges.update(upd);
+  document.querySelectorAll(".card").forEach(c => c.classList.remove("envolvida"));
+  const gs = gramposFiltrados();
+  painelTitulo.textContent = `Conversas filtradas (${gs.length})`;
 }
 function tocar(id) { tocarLista(id, grampos.filter(g => g.id === id)); }
 function tocarDePessoa(nome) { const gs = grampos.filter(g => g.participantes.some(p => p.nome === nome)); if (gs.length) tocarLista(gs[0].id, gs); }
