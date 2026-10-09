@@ -229,7 +229,18 @@ function render() {
   rede.on("zoom", ({ scale }) => {
     if (scale < 0.25) rede.moveTo({ scale: 0.25 });
     else if (scale > 2.5) rede.moveTo({ scale: 2.5 });
+    clampView();
   });
+  // prende a vista à área visível (nó some atrás dos painéis)
+  function clampView() {
+    const p = rede.getViewPosition();
+    const w = document.getElementById("mapa").clientWidth;
+    const h = document.getElementById("mapa").clientHeight;
+    const x = Math.max(-w*0.9, Math.min(w*0.9, p.x));
+    const y = Math.max(-h*0.9, Math.min(h*0.9, p.y));
+    if (x !== p.x || y !== p.y) rede.moveTo({ position: { x, y } });
+  }
+  rede.on("dragEnd", clampView);
 
   // depois de organizar, desliga a física: nós ficam onde o usuário arrumar
   rede.once("stabilizationIterationsDone", () => rede.setOptions({ physics: false }));
